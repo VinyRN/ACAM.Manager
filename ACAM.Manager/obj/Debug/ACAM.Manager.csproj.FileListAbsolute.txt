@@ -1,0 +1,10 @@
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\ACAM.Manager.exe.config
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\ACAM.Manager.exe
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\ACAM.Manager.pdb
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\EPPlus.dll
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\EPPlus.Interfaces.dll
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\EPPlus.System.Drawing.dll
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\bin\Debug\EPPlus.xml
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\obj\Debug\ACAM.Manager.csprojResolveAssemblyReference.cache
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\obj\Debug\ACAM.Manager.exe
+c:\users\lucas\documents\visual studio 2015\Projects\ACAM.Manager\ACAM.Manager\obj\Debug\ACAM.Manager.pdb

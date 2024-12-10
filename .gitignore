@@ -1,0 +1,98 @@
+## Ignore Visual Studio temporary files, build results, and
+## build directories.
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (Mono Auto Generated)
+mono_crash.*
+
+# Auto-generated VSCode settings
+.vscode/
+
+# Ignore folder for repository specific data
+.vs/
+
+# Mono auto generated files
+mono_crash.*
+
+# Build Results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# C++ project and resource files
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.vcxproj.*
+*.vcxproj
+*.vcproj.*
+
+# Rider project files
+.idea/
+
+# Microsoft Visual Studio cache files
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio Trace Files
+*.trace
+
+# Package Directory
+packages/
+*.nupkg
+*.snupkg
+*.nuspec
+
+# Node.js Directories
+node_modules/
+npm-debug.log
+yarn-error.log
+.yarn-integrity
+
+# JetBrains Rider
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+desktop.ini
