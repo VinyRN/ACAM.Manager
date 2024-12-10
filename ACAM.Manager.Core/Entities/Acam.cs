@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ACAM.Manager.DTOs
+namespace ACAM.Manager.Core.Entities
 {
-    public class AcamDTO
+    public class Acam
     {
         public string Tipo { get; set; } // FX ou EFX
         public string Cpf { get; set; }
@@ -13,6 +13,6 @@ namespace ACAM.Manager.DTOs
         public string MotivoHit { get; set; } // "Restrição por Valor", "Lista CAF", etc.
         public decimal ValorRestricao { get; set; } // Para hits por valor acumulado
         public string DetalhesCAF { get; set; } // Para hits na lista CAF
+        public decimal valorAcumulado { get; set; }
     }
-
 }

@@ -5,7 +5,13 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Manager", "ACAM.Manager\ACAM.Manager.csproj", "{A3D9CE8E-F17D-4329-95C7-97D14001C903}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Migration", "ACAM.Migration\ACAM.Migration.csproj", "{A52A9A0D-72A2-4AB1-B7D5-68DA7CD75E47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Manager.Migration", "ACAM.Migration\ACAM.Manager.Migration.csproj", "{A52A9A0D-72A2-4AB1-B7D5-68DA7CD75E47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Manager.Core", "ACAM.Manager.Core\ACAM.Manager.Core.csproj", "{F306BA31-CAE4-4978-A2D6-A9EC9BCFCB3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Manager.Application", "ACAM.Manager.Application\ACAM.Manager.Application.csproj", "{031B2B6F-978A-468F-B739-41FB1B6F4DC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACAM.Manager.Infrastructure", "ACAM.Manager.Infrastructure\ACAM.Manager.Infrastructure.csproj", "{E645FE6C-3FFC-4EFB-9499-4E6068423D6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{A52A9A0D-72A2-4AB1-B7D5-68DA7CD75E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A52A9A0D-72A2-4AB1-B7D5-68DA7CD75E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A52A9A0D-72A2-4AB1-B7D5-68DA7CD75E47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F306BA31-CAE4-4978-A2D6-A9EC9BCFCB3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F306BA31-CAE4-4978-A2D6-A9EC9BCFCB3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F306BA31-CAE4-4978-A2D6-A9EC9BCFCB3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F306BA31-CAE4-4978-A2D6-A9EC9BCFCB3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{031B2B6F-978A-468F-B739-41FB1B6F4DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{031B2B6F-978A-468F-B739-41FB1B6F4DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{031B2B6F-978A-468F-B739-41FB1B6F4DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{031B2B6F-978A-468F-B739-41FB1B6F4DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E645FE6C-3FFC-4EFB-9499-4E6068423D6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E645FE6C-3FFC-4EFB-9499-4E6068423D6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E645FE6C-3FFC-4EFB-9499-4E6068423D6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E645FE6C-3FFC-4EFB-9499-4E6068423D6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
