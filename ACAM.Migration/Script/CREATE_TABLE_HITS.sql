@@ -1,6 +1,0 @@
-CREATE TABLE Hits (
-    Cpf NVARCHAR(11) NOT NULL PRIMARY KEY,
-    MotivoHit NVARCHAR(255) NOT NULL,
-    Detalhes NVARCHAR(MAX) NOT NULL,
-    DataAtualizacao DATETIME NOT NULL
-);
