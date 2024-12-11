@@ -31,35 +31,38 @@ internal class Program
         string connectionString = _configuration["ConnectionStrings:DefaultConnection"];
 
 
-        if (File.Exists(caminhoImportacao))
+        if (Directory.Exists(caminhoImportacao))
         {
             try
             {
-                #region Passo 1 - ler, tratar e importar o arquivo
+                #region Passo 1 - Verificar tabelas necessárias
                 _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAM_ARQUIVO.SQL"), "AcamArquivo");
-
-                _idFile = _serviceArquivo.InicioDoProcessoArquivo(connectionString,caminhoImportacao);                
-
                 _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAMDATA.SQL"), "AcamData");
-
-                _servicesRegistros.ProcessarCsvPorStreaming(caminhoImportacao,_idFile);
-                #endregion
-
-                #region Passo 2 - Filtrar as pessoas com mais de 45k aplicados e inserir na tabela restritiva
                 _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAM_RESTRITIVA.SQL"), "Acam_Restritiva");
-                _servicesRegistros.FiltrarRegistrosPorValor(45000, _idFile);
-                _servicesRegistros.InserirNaTabelaRestritiva(45000, _idFile);
                 #endregion
 
+                #region Passo 2 - Processar todos os arquivos CSV na pasta
+                string[] arquivosCsv = Directory.GetFiles(caminhoImportacao, "*.csv");
+
+                foreach (var arquivo in arquivosCsv)
+                {
+                    Console.WriteLine($"Processando arquivo: {arquivo}");
+
+                    int idFile = _serviceArquivo.InicioDoProcessoArquivo(connectionString, arquivo);
+
+                    _servicesRegistros.ProcessarCsvPorStreaming(arquivo, idFile);
+
+                    _servicesRegistros.FiltrarRegistrosPorValor(45000, idFile);
+                    _servicesRegistros.InserirNaTabelaRestritiva(45000, idFile);
+
+                    Console.WriteLine($"Arquivo {arquivo} processado com sucesso.");
+                }
+                #endregion
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao processar o arquivo CSV: {ex.Message}");
+                Console.WriteLine($"Erro ao processar os arquivos CSV: {ex.Message}");
             }
-        }
-        else
-        {
-            throw new NullReferenceException("Arquivo inexistente!");
         }
     }
 }

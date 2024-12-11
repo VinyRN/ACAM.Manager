@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ACAM.Data\ACAM.Data.csproj" />
     <ProjectReference Include="..\ACAM.Domain\ACAM.Domain.csproj" />
     <ProjectReference Include="..\ACAM.Mapping\ACAM.Mapping.csproj" />
   </ItemGroup>
