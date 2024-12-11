@@ -35,18 +35,22 @@ internal class Program
         {
             try
             {
+                #region Passo 1 - ler, tratar e importar o arquivo
                 _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAM_ARQUIVO.SQL"), "AcamArquivo");
-
-                //CRIAR A TABELA ONDE TERÁ NOME DO ARQUIVO, ID E DATA DA IMPORTAÇÃO.
-                //
-                // NA TABELA ACAM COLOCAR O ID DA TABELA ACAM_ARQUIVO...
-                // 
 
                 _idFile = _serviceArquivo.InicioDoProcessoArquivo(connectionString,caminhoImportacao);                
 
                 _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAMDATA.SQL"), "AcamData");
 
                 _servicesRegistros.ProcessarCsvPorStreaming(caminhoImportacao,_idFile);
+                #endregion
+
+                #region Passo 2 - Filtrar as pessoas com mais de 45k aplicados e inserir na tabela restritiva
+                _serviceVerificacao.VerificarOuCriarTabela(connectionString, _serviceVerificacao.ObterCaminhoSqlLocal("CREATE_ACAM_RESTRITIVA.SQL"), "Acam_Restritiva");
+                _servicesRegistros.FiltrarRegistrosPorValor(45000, _idFile);
+                _servicesRegistros.InserirNaTabelaRestritiva(45000, _idFile);
+                #endregion
+
             }
             catch (Exception ex)
             {

@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Migrations\Scripts\CREATE_ACAM_RESTRITIVA.SQL">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Migrations\Scripts\CREATE_ACAMDATA.SQL">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
