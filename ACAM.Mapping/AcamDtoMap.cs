@@ -1,6 +1,7 @@
-﻿using CsvHelper.Configuration;
+﻿using ACAM.Domain.DTOs;
+using CsvHelper.Configuration;
 
-namespace ACAM
+namespace ACAM.Mapping
 {
     public sealed class AcamDtoMap : ClassMap<AcamDTO>
     {

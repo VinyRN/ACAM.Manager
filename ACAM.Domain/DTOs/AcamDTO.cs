@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ACAM
+﻿namespace ACAM.Domain.DTOs
 {
     public class AcamDTO
     {
@@ -11,6 +9,6 @@ namespace ACAM
         public string Amount { get; set; }
         public DateTime? TrnDate { get; set; }
 
-        public int Id_file {  get; set; }
+        public int Id_file { get; set; }
     }
 }
