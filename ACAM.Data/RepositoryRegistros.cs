@@ -149,12 +149,19 @@ namespace ACAM.Data
                 WHERE Amount > @valorMinimo
                   AND Id_arquivo = @idFile
                   AND TrnDate >= DATEADD(DAY, -365, GETDATE())";
+            
+            string queryFiltrarTudo = @"
+                SELECT Client, Pix_Key, cpf_name, Amount, TrnDate
+                FROM AcamData
+                WHERE Id_arquivo = @idFile";
 
             string queryTrucar = "TRUNCATE TABLE Acam_Restritiva";
 
             string queryInserir = @"
                 INSERT INTO Acam_Restritiva (Client, Pix_Key, cpf_name, Amount, TrnDate, Id_arquivo)
                 VALUES (@Client, @Pix_Key, @cpf_name, @Amount, @TrnDate, @Id_arquivo)";
+
+            var arquivosProcessados = new List<string>();
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -165,7 +172,7 @@ namespace ACAM.Data
                     try
                     {
 
-                        using (var truncCommand = new SqlCommand(queryInserir, connection, transaction))
+                        using (var truncCommand = new SqlCommand(queryTrucar, connection, transaction))
                         {
                             truncCommand.ExecuteNonQuery();
                         }
@@ -190,12 +197,37 @@ namespace ACAM.Data
                                         TrnDate = reader["TrnDate"] as DateTime?
                                     };
 
-                                    if (decimal.TryParse(registro.Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) && amount > valorMinimo)
+                                    if (decimal.TryParse(registro.Amount, NumberStyles.Any, new CultureInfo("pt-BR"), out var amount) && amount > valorMinimo)
                                     {
                                         registrosFiltrados.Add(registro);
                                     }
                                     else
                                     {
+                                        registrosNaoInseridos.Add(registro);
+                                    }
+                                }
+                            }
+                        }
+
+                        if(registrosNaoInseridos.Count == 0)
+                        {
+                            using (var command = new SqlCommand(queryFiltrarTudo, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@idFile", idFile);
+
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        var registro = new AcamDTO
+                                        {
+                                            Client = reader["Client"].ToString(),
+                                            Pix_Key = reader["Pix_Key"].ToString(),
+                                            cpf_name = reader["cpf_name"].ToString(),
+                                            Amount = reader["Amount"].ToString(),
+                                            TrnDate = reader["TrnDate"] as DateTime?
+                                        };
+
                                         registrosNaoInseridos.Add(registro);
                                     }
                                 }
@@ -212,7 +244,7 @@ namespace ACAM.Data
                                 insertCommand.Parameters.AddWithValue("@cpf_name", registro.cpf_name);
 
                                 // Converter o Amount para decimal ou passar DBNull se inválido
-                                if (decimal.TryParse(registro.Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
+                                if (decimal.TryParse(registro.Amount, NumberStyles.Any, new CultureInfo("pt-BR"), out var amount))
                                 {
                                     insertCommand.Parameters.AddWithValue("@Amount", amount);
                                 }
@@ -231,8 +263,10 @@ namespace ACAM.Data
 
                         transaction.Commit();
                         // Gerar relatório dos não inseridos
-                        SalvarRelatorioNaoInseridos(registrosNaoInseridos, _NOME_RELATORIO);
-                        Console.WriteLine("Registros inseridos na tabela Acam_Restritiva com sucesso.");
+                        if(registrosNaoInseridos.Count > 0)
+                        {
+                            SalvarRelatorioNaoInseridos(registrosNaoInseridos);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -250,36 +284,54 @@ namespace ACAM.Data
 
             return inicio + data+ hora+ ".xlsx";
         }
-        private void SalvarRelatorioNaoInseridos(IEnumerable<AcamDTO> registros, string caminhoArquivo)
+        private void SalvarRelatorioNaoInseridos(IEnumerable<AcamDTO> registros)
         {
-            using var workbook = new XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Não Inseridos");
-
-            // Cabeçalhos
-            worksheet.Cell(1, 1).Value = "Client";
-            worksheet.Cell(1, 2).Value = "Pix_Key";
-            worksheet.Cell(1, 3).Value = "cpf_name";
-            worksheet.Cell(1, 4).Value = "Amount";
-            worksheet.Cell(1, 5).Value = "TrnDate";
-
-            // Dados
-            var linha = 2;
-            foreach (var registro in registros)
+            try
             {
-                worksheet.Cell(linha, 1).Value = registro.Client;
-                worksheet.Cell(linha, 2).Value = registro.Pix_Key;
-                worksheet.Cell(linha, 3).Value = registro.cpf_name;
-                worksheet.Cell(linha, 4).Value = registro.Amount;
-                worksheet.Cell(linha, 5).Value = registro.TrnDate;
-                linha++;
+                string caminhoImportacao = configuration["Configuracoes:CaminhoLocal"];
+
+                string pastaRelatorios = Path.Combine(caminhoImportacao, "processados", "relatorios");
+
+                if (!Directory.Exists(pastaRelatorios))
+                {
+                    Directory.CreateDirectory(pastaRelatorios);
+                }
+
+                string caminhoRelatorio = Path.Combine(pastaRelatorios, NomeDoRelatorio());
+
+                using var workbook = new XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("Não Inseridos");
+
+                // Cabeçalhos
+                worksheet.Cell(1, 1).Value = "Client";
+                worksheet.Cell(1, 2).Value = "Pix_Key";
+                worksheet.Cell(1, 3).Value = "cpf_name";
+                worksheet.Cell(1, 4).Value = "Amount";
+                worksheet.Cell(1, 5).Value = "TrnDate";
+
+                // Dados
+                var linha = 2;
+                foreach (var registro in registros)
+                {
+                    worksheet.Cell(linha, 1).Value = registro.Client;
+                    worksheet.Cell(linha, 2).Value = registro.Pix_Key;
+                    worksheet.Cell(linha, 3).Value = registro.cpf_name;
+                    worksheet.Cell(linha, 4).Value = registro.Amount;
+                    worksheet.Cell(linha, 5).Value = registro.TrnDate;
+                    linha++;
+                }
+
+                // Ajuste automático de colunas
+                worksheet.Columns().AdjustToContents();
+
+                // Salvar o arquivo
+                workbook.SaveAs(caminhoRelatorio);
+                Console.WriteLine($"Relatório dos não inseridos salvo em: {pastaRelatorios}");
             }
-
-            // Ajuste automático de colunas
-            worksheet.Columns().AdjustToContents();
-
-            // Salvar o arquivo
-            workbook.SaveAs(caminhoArquivo);
-            Console.WriteLine($"Relatório dos não inseridos salvo em: {caminhoArquivo}");
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

@@ -43,7 +43,7 @@ internal class Program
 
                 #region Passo 2 - Processar todos os arquivos CSV na pasta
                 string[] arquivosCsv = Directory.GetFiles(caminhoImportacao, "*.csv");
-                var arquivosProcessados = new List<string>();
+                string[] arquivosProcessados = arquivosCsv;
 
                 foreach (var arquivo in arquivosCsv)
                 {
@@ -61,7 +61,7 @@ internal class Program
                 #endregion
 
                 #region Passo 3 - Ao final do processo mover para PROCESSADOS
-                string pastaProcessados = Path.Combine(caminhoImportacao, "processados");
+                string pastaProcessados = Path.Combine(caminhoImportacao, "PROCESSADOS");
 
                 if (!Directory.Exists(pastaProcessados))
                 {
