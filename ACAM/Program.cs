@@ -43,6 +43,7 @@ internal class Program
 
                 #region Passo 2 - Processar todos os arquivos CSV na pasta
                 string[] arquivosCsv = Directory.GetFiles(caminhoImportacao, "*.csv");
+                var arquivosProcessados = new List<string>();
 
                 foreach (var arquivo in arquivosCsv)
                 {
@@ -56,6 +57,31 @@ internal class Program
                     _servicesRegistros.InserirNaTabelaRestritiva(45000, idFile);
 
                     Console.WriteLine($"Arquivo {arquivo} processado com sucesso.");
+                }
+                #endregion
+
+                #region Passo 3 - Ao final do processo mover para PROCESSADOS
+                string pastaProcessados = Path.Combine(caminhoImportacao, "processados");
+
+                if (!Directory.Exists(pastaProcessados))
+                {
+                    Directory.CreateDirectory(pastaProcessados);
+                }
+
+                foreach (var arquivo in arquivosProcessados)
+                {
+                    string nomeArquivo = Path.GetFileName(arquivo);
+                    string destino = Path.Combine(pastaProcessados, nomeArquivo);
+
+                    try
+                    {
+                        File.Move(arquivo, destino, true);
+                        Console.WriteLine($"Arquivo movido para: {destino}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro ao mover o arquivo {nomeArquivo}: {ex.Message}");
+                    }
                 }
                 #endregion
             }

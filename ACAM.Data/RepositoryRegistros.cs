@@ -1,9 +1,11 @@
 ﻿using ACAM.Domain.DTOs;
 using ACAM.Domain.Interface.Repository;
 using ACAM.Mapping;
+using ClosedXML.Excel;
 using CsvHelper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Win32;
 using System.Data;
 using System.Formats.Asn1;
 using System.Globalization;
@@ -16,6 +18,7 @@ namespace ACAM.Data
 
         private IConfiguration configuration;
 
+        private string _NOME_RELATORIO;
         public void ProcessarCsvPorStreaming(string caminhoCsv, int idArquivo)
         {
             using (var reader = new StreamReader(caminhoCsv))
@@ -134,6 +137,8 @@ namespace ACAM.Data
 
         public void InserirNaTabelaRestritiva(decimal valorMinimo, int idFile)
         {
+            _NOME_RELATORIO = NomeDoRelatorio();
+
             builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             configuration = builder.Build();
             string connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -144,6 +149,8 @@ namespace ACAM.Data
                 WHERE Amount > @valorMinimo
                   AND Id_arquivo = @idFile
                   AND TrnDate >= DATEADD(DAY, -365, GETDATE())";
+
+            string queryTrucar = "TRUNCATE TABLE Acam_Restritiva";
 
             string queryInserir = @"
                 INSERT INTO Acam_Restritiva (Client, Pix_Key, cpf_name, Amount, TrnDate, Id_arquivo)
@@ -157,8 +164,13 @@ namespace ACAM.Data
                 {
                     try
                     {
-                        // Armazenar os resultados da consulta em uma lista
-                        var registros = new List<AcamDTO>();
+
+                        using (var truncCommand = new SqlCommand(queryInserir, connection, transaction))
+                        {
+                            truncCommand.ExecuteNonQuery();
+                        }
+                        var registrosFiltrados = new List<AcamDTO>();
+                        var registrosNaoInseridos = new List<AcamDTO>();
 
                         using (var command = new SqlCommand(queryFiltrar, connection, transaction))
                         {
@@ -169,20 +181,29 @@ namespace ACAM.Data
                             {
                                 while (reader.Read())
                                 {
-                                    registros.Add(new AcamDTO
+                                    var registro = new AcamDTO
                                     {
                                         Client = reader["Client"].ToString(),
                                         Pix_Key = reader["Pix_Key"].ToString(),
                                         cpf_name = reader["cpf_name"].ToString(),
                                         Amount = reader["Amount"].ToString(),
                                         TrnDate = reader["TrnDate"] as DateTime?
-                                    });
+                                    };
+
+                                    if (decimal.TryParse(registro.Amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) && amount > valorMinimo)
+                                    {
+                                        registrosFiltrados.Add(registro);
+                                    }
+                                    else
+                                    {
+                                        registrosNaoInseridos.Add(registro);
+                                    }
                                 }
                             }
                         }
 
                         // Inserir os registros na tabela restritiva
-                        foreach (var registro in registros)
+                        foreach (var registro in registrosFiltrados)
                         {
                             using (var insertCommand = new SqlCommand(queryInserir, connection, transaction))
                             {
@@ -209,6 +230,8 @@ namespace ACAM.Data
 
 
                         transaction.Commit();
+                        // Gerar relatório dos não inseridos
+                        SalvarRelatorioNaoInseridos(registrosNaoInseridos, _NOME_RELATORIO);
                         Console.WriteLine("Registros inseridos na tabela Acam_Restritiva com sucesso.");
                     }
                     catch (Exception ex)
@@ -218,6 +241,45 @@ namespace ACAM.Data
                     }
                 }
             }
+        }
+        public string NomeDoRelatorio()
+        {
+            string inicio = "RelatorioNaoInseridos";
+            string data = $"_{ DateTime.Now.Day}_{DateTime.Now.Month}_{DateTime.Now.Year}";
+            string hora = $"_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}";
+
+            return inicio + data+ hora+ ".xlsx";
+        }
+        private void SalvarRelatorioNaoInseridos(IEnumerable<AcamDTO> registros, string caminhoArquivo)
+        {
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Não Inseridos");
+
+            // Cabeçalhos
+            worksheet.Cell(1, 1).Value = "Client";
+            worksheet.Cell(1, 2).Value = "Pix_Key";
+            worksheet.Cell(1, 3).Value = "cpf_name";
+            worksheet.Cell(1, 4).Value = "Amount";
+            worksheet.Cell(1, 5).Value = "TrnDate";
+
+            // Dados
+            var linha = 2;
+            foreach (var registro in registros)
+            {
+                worksheet.Cell(linha, 1).Value = registro.Client;
+                worksheet.Cell(linha, 2).Value = registro.Pix_Key;
+                worksheet.Cell(linha, 3).Value = registro.cpf_name;
+                worksheet.Cell(linha, 4).Value = registro.Amount;
+                worksheet.Cell(linha, 5).Value = registro.TrnDate;
+                linha++;
+            }
+
+            // Ajuste automático de colunas
+            worksheet.Columns().AdjustToContents();
+
+            // Salvar o arquivo
+            workbook.SaveAs(caminhoArquivo);
+            Console.WriteLine($"Relatório dos não inseridos salvo em: {caminhoArquivo}");
         }
     }
 }
